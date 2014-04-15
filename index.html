@@ -31,6 +31,7 @@
 		  level = 5, //num of circles on screen
 		  gameStart = false,
 		  gameOver = false,
+		  gameWin = false,
 		  W = window.innerWidth,
 		  H = window.innerHeight,
 		  chars = 'abcdefghijklmnopqrstuvwxyz'.toUpperCase();
@@ -66,7 +67,7 @@
       }
 
 	  function gameStartMsg(){
-	    context.font = "33px Arial";
+	    	context.font = "33px Arial";
 		context.fillStyle = "white";
 		context.fillText("Welcome to", W/2 - 100, H/2-50);
 		context.fillText("Type Game", W/2 - 95, H/2);
@@ -75,10 +76,14 @@
 	  }
 
 	  function gameOverMsg(){
-	    context.font = "33px Arial";
-	    context.fillStyle = "white";
-		context.fillText("Game Over", W/2 - 82, H/2 - 50);
-        context.fillText("Score: " + score, W/2 - 70, H/2);
+	  	context.font = "33px Arial";
+	  	context.fillStyle = "white";
+	  	if(gameWin){
+	  		context.fillText("You win!", W/2 - 80, H/2 - 50)	
+	  	} else {
+			context.fillText("Game Over", W/2 - 82, H/2 - 50);
+	  	}
+        	context.fillText("Score: " + score, W/2 - 70, H/2);
 		context.font = "20px Arial";
 		context.fillText("Pressed ANY key to restart", W/2 - 124, H/2+35);
 	  }
@@ -86,6 +91,7 @@
 	  function start(){
 	    gameStart = true;
 	    gameOver = false;
+	    gameWin = false;
 		time = 60;
 		score = 0;
 		lastTime = Date.now();
@@ -124,25 +130,28 @@
       (function drawFrame () {
         animRequest = window.requestAnimationFrame(drawFrame, canvas);
         context.clearRect(0, 0, canvas.width, canvas.height);
-		context.fillStyle = '#d9ca9e';
+	context.fillStyle = '#d9ca9e';
         context.fillRect(0, 0, canvas.width, canvas.height);
-		if(!gameStart){
-			gameStartMsg();
-		} else{
+	if(!gameStart){
+		gameStartMsg();
+	} else{
         context.font = "bold 24px Arial";
         context.fillStyle = "white";
         circlesOnScreen.forEach(move);
-		circlesOnScreen.forEach(checkY);
+	circlesOnScreen.forEach(checkY);
         circlesOnScreen.forEach(draw);
-		delta  = Math.floor((Date.now() - lastTime)/1000);
-		if(time-delta <= 0 || gameOver){
-		    gameOver = true;
-			gameOverMsg();
-		} else {
-		    context.fillText("Time: " + (time-delta), 20, 30);
-            context.fillText("Score: " + score, 20, 60);
+	delta  = Math.floor((Date.now() - lastTime)/1000);
+	if(time-delta <= 0 || gameOver){
+		gameOver = true;
+		if(time-delta<=0){
+			gameWin = true;
 		}
-		}
+		gameOverMsg();
+	} else {
+		context.fillText("Time: " + (time-delta), 20, 30);
+            	context.fillText("Score: " + score, 20, 60);
+	}
+	}
       }());
     }
     </script>
