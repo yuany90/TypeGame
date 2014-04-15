@@ -1,300 +1,150 @@
 <!doctype html>
-
 <html>
-
   <head>
-
     <title>See how fast you can type</title>
-
     <style>
-
 		*{
-
 		   margin:0 auto;
-
 		   padding:0;
-
 		}
-
 		body{
-
 		   overflow:hidden;
-
 		   background:black;
-
 		   text-align:center;
-
 		}
-
 	</style>
-
   </head>
-
   <body>
-
     <canvas id="canvas" width="600" height="600"></canvas>
-
     <script src="animate.js"></script>
-
     <script src="circle.js"></script>
-
     <script>
-
     window.onload = function () {
-
       var canvas = document.getElementById('canvas'),
-
           context = canvas.getContext('2d'),
-
           circles = [],
-
 		  circlesOnScreen = [],
-
           num = 26,
-
 		  time,
-
 		  lastTime;
-
 		  score = 0,
-
 		  level = 5, //num of circles on screen
-
 		  gameStart = false,
-
 		  gameOver = false,
-
 		  W = window.innerWidth,
-
 		  H = window.innerHeight,
-
 		  chars = 'abcdefghijklmnopqrstuvwxyz'.toUpperCase();
 
-		  
-
 	  W = W>3*H/2?3*H/2:W;
-
 	  canvas.width = W;
-
 	  canvas.height = H;
 
-	  
-
 	  function getScreenCircle(i){
-
 	    var index;
-
 		var circle;
-
 	    do{
-
 	      index = Math.floor(Math.random()*num);
-
 		}while(circles[index].onScreen)
-
 		circle = circles[index];
-
 		circle.index = i;
-
 		circle.onScreen = true;
-
 	    circlesOnScreen[i] = circle;
-
 	  }
-
-	  
 
       function checkY (circle) {
-
         if (circle.y - circle.radius > canvas.height) {
-
 		  gameOver = true;
-
         }
-
       }
-
-
 
       function move (circle) {
-
         circle.y += circle.vy;
-
       }
-
-
 
       function draw (circle) {
-
         circle.draw(context);
-
       }
 
-	  
-
 	  function gameStartMsg(){
-
 	    context.font = "33px Arial";
-
 		context.fillStyle = "white";
-
 		context.fillText("Welcome to", W/2 - 100, H/2-50);
-
 		context.fillText("Type Game", W/2 - 95, H/2);
-
 		context.font = "20px Arial";
-
 		context.fillText("Pressed ANY key to start", W/2 - 122, H/2 + 35);
-
 	  }
-
-	  
 
 	  function gameOverMsg(){
-
 	    context.font = "33px Arial";
-
 	    context.fillStyle = "white";
-
 		context.fillText("Game Over", W/2 - 82, H/2 - 50);
-
         context.fillText("Score: " + score, W/2 - 70, H/2);
-
 		context.font = "20px Arial";
-
 		context.fillText("Pressed ANY key to restart", W/2 - 124, H/2+35);
-
 	  }
-
-	  
 
 	  function start(){
-
 	    gameStart = true;
-
 	    gameOver = false;
-
 		time = 60;
-
 		score = 0;
-
 		lastTime = Date.now();
-
 	    if(circles.length == 0){
-
 		  for (var circle, i = 0; i < num; i++) {
-
 			circle = new Circle(chars[i], W);
-
 			circles.push(circle);
-
 		  }
-
 		} else {
-
 		  for (var circle, i = 0; i < num; i++) {
-
 		   circles[i].initialize()
-
 		  }
-
 		}
-
         for(var i = 0; i < level; i++){
-
 		  getScreenCircle(i);
-
 	    }
-
 	  }
 
-	  
-
 	  window.addEventListener('keydown', function (event) {
-
 		if (!gameStart || gameOver){
-
 		   start();
-
 		} else {
-
 		var charEnter = '', circleEnter;
-
         if (event.keyCode >= 65 && event.keyCode <= 90) {
-
 		  charEnter = chars[event.keyCode - 65];
-
 		  circleEnter = circles[event.keyCode - 65];
-
 		  if(circleEnter.onScreen && circleEnter.y > 0){
-
 		  score ++;
-
 		  circleEnter.initialize();
-
 		  getScreenCircle(circleEnter.index);
-
 		  }
-
 		}
-
 		}
-
       });
 
-	  
-
       (function drawFrame () {
-
         animRequest = window.requestAnimationFrame(drawFrame, canvas);
-
         context.clearRect(0, 0, canvas.width, canvas.height);
-
 		context.fillStyle = '#d9ca9e';
-
         context.fillRect(0, 0, canvas.width, canvas.height);
-
 		if(!gameStart){
-
 			gameStartMsg();
-
 		} else{
-
         context.font = "bold 24px Arial";
-
         context.fillStyle = "white";
-
         circlesOnScreen.forEach(move);
-
 		circlesOnScreen.forEach(checkY);
-
         circlesOnScreen.forEach(draw);
-
 		delta  = Math.floor((Date.now() - lastTime)/1000);
-
 		if(time-delta <= 0 || gameOver){
-
 		    gameOver = true;
-
 			gameOverMsg();
-
 		} else {
-
 		    context.fillText("Time: " + (time-delta), 20, 30);
-
             context.fillText("Score: " + score, 20, 60);
-
 		}
-
 		}
-
       }());
-
     }
-
     </script>
-
   </body>
-
 </html>
-
